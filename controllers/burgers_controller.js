@@ -1,40 +1,33 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var Burger = require('../models/burger.js');
+var burger = require("../models/burger.js");
 
-router.get('/', function(req, res) {
-    res.redirect('/burger')
+router.get("/", function(req, res) {
+    res.redirect("/burgers");
 });
+router.get("/burgers", function(req, res) {
 
-router.get('/burger', function(req, res) {
-    // Burger.findAll({}).then(function(data){
-    // 	var hbsObject = {burger : data}
-    // 	console.log(hbsObject)
-    // 	res.render('index', hbsObject);
-    // });
+    burger.all(function(burgerData) {
 
-    Burger.all(function(data) {
-        var hbsObject = { burgers: data }
-        console.log(hbsObject)
-        res.render('index', hbsObject);
+        res.render("index", { burger_data: burgerData });
     });
 });
 
+router.post("/burgers/create", function(req, res) {
 
-router.post('/burger/create', function(req, res) {
-    burger.create(['name', 'devoured'], [req.body.name, req.body.devoured], function(data) {
-        res.redirect('/burger')
+    burger.create(req.body.burger_name, function(result) {
+
+        console.log(result);
+        res.redirect("/");
     });
 });
-
-router.put('/burger/update/:id', function(req, res) {
-    var condition = 'id = ' + req.params.id;
-
-    console.log('condition', condition);
-
-    burger.update({ 'devoured': req.body.devoured }, condition, function(data) {
-        res.redirect('/burger');
+// put route -> back to index
+router.put("/burgers/update", function(req, res) {
+    burger.update(req.body.burger_id, function(result) {
+        // wrapper for orm.js that using MySQL update callback will return a log to console,
+        // render back to index with handle
+        console.log(result);
+        res.redirect("/");
     });
 });
-
 module.exports = router;
